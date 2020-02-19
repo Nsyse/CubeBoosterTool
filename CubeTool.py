@@ -15,32 +15,37 @@ cube = {
     "Colorless": 765
 }
 
-qtyBoosters = -1
-
 
 def output(boosters):
     for b in boosters:
         print(b, '\n')
 
 
-while not (type(qtyBoosters) is int and (0 < qtyBoosters <= max_boosters)):
-    print(f'Combien de boosters tu veux? Le maximum supporte est : {max_boosters} '
-          f'\nChoisis un nb de boosters entre 1 et {max_boosters}')
-    qtyBoosters = int(input())
+def main(*args):
+    qtyBoosters = -1
 
-print(f"\nVoici {qtyBoosters} boosters :\n")
+    while not (type(qtyBoosters) is int and (0 < qtyBoosters <= max_boosters)):
+        print(f'Combien de boosters tu veux? Le maximum supporte est : {max_boosters} '
+              f'\nChoisis un nb de boosters entre 1 et {max_boosters}')
+        qtyBoosters = int(input())
 
-boosters = []
+    print(f"\nVoici {qtyBoosters} boosters :\n")
 
-for i in range(qtyBoosters):
-    booster = {"White": 0, "Blue": 0, "Black": 0, "Red": 0, "Green": 0, "Fix": 0, "Multi": 0, "Colorless": 0}
-    bcards = np.random.randint(0, cube_size, booster_size)
-    for c in bcards:
-        for (t, j) in cube.items():
-            if c < j:
-                booster[t] += 1
-                break
+    boosters = []
 
-    boosters.append(booster)
+    for i in range(qtyBoosters):
+        booster = {"White": 0, "Blue": 0, "Black": 0, "Red": 0, "Green": 0, "Fix": 0, "Multi": 0, "Colorless": 0}
+        bcards = np.random.randint(0, cube_size, booster_size)
+        for c in bcards:
+            for (t, j) in cube.items():
+                if c < j:
+                    booster[t] += 1
+                    break
 
-output(boosters)
+        boosters.append(booster)
+
+    output(boosters)
+
+
+if __name__ == '__main__':
+    main()
