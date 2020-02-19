@@ -27,7 +27,10 @@ def main(*args):
     while not (type(qtyBoosters) is int and (0 < qtyBoosters <= max_boosters)):
         print(f'Combien de boosters tu veux? Le maximum supporte est : {max_boosters} '
               f'\nChoisis un nb de boosters entre 1 et {max_boosters}')
-        qtyBoosters = int(input())
+        try:
+            qtyBoosters = int(input())
+        except EOFError:
+            exit(0)
 
     print(f"\nVoici {qtyBoosters} boosters :\n")
 
