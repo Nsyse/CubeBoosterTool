@@ -8,31 +8,39 @@ class Cube:
     def __init__(self, categories: dict):
         self.categories = categories
         self.size = np.sum(list(self.categories.values()))
-        self.indices = self.__build_indices()
+        self.indices = self.__build_indices(self.categories)
+        self.size_remaining = self.size
+
+    def reset(self):
+        self.size_remaining = self.size
 
     def __getitem__(self, item):
         return self.categories[item]
 
-    def __build_indices(self):
+    @staticmethod
+    def __build_indices(cat):
         indices = {}
 
         total = 0
-        for i, j in self.categories.items():
+        for i, j in cat.items():
             indices[i] = total + j
             total += j
 
         return indices
 
-    def get_rand_booster(self, size=15):
+    def get_rand_booster(self, size=15, pulls=None):
 
         booster = dict.fromkeys(self.categories.keys(), 0)
 
-        for c in np.random.randint(0, self.size, size):
-            for (t, j) in self.indices.items():
+        indices = self.indices if pulls is None else self.__build_indices(sub_dicts(self.categories, pulls))
+
+        for c in np.random.choice(self.size_remaining, size, replace=False):
+            for (t, j) in indices.items():
                 if c < j:
                     booster[t] += 1
                     break
         assert np.sum(list(booster.values())) == size
+        self.size_remaining -= size
         return booster
 
     def get_max_boosters(self, booster_size):
@@ -73,25 +81,37 @@ def query_int(msg: str):
 def output(boosters, print_type="BOOSTERS"):
     assert len(boosters) > 0
 
-    print(f"\nVoici {len(boosters)} boosters :\n")
-
     if print_type == 'BOOSTERS':
+        print(f"\nVoici {len(boosters)} boosters :\n")
         for b in boosters:
             print(b, '\n')
     elif print_type == 'CATEGORIES':
+        print(f"\nVoici les cartes pour chacune des {len(boosters[0].keys())} catégories :\n")
         for k in boosters[0].keys():
             cat = []
             for b in boosters:
                 cat.append(b[k])
-            print(k, ':')
+            print(k, f'({np.sum(cat)}):')
             print(cat, '\n')
+
+
+def add_dicts(d1: dict, d2: dict):
+    return {k: d1[k] + d2[k] for k in d1.keys()}
+
+
+def sub_dicts(d1: dict, d2: dict):
+    return {k: d1[k] - d2[k] for k in d1.keys()}
 
 
 def build_boosters(qty_boosters: int, booster_size: int, cube: Cube):
     boosters = []
 
+    pulls = dict.fromkeys(cube.categories.keys(), 0)
+
     for i in range(qty_boosters):
-        boosters.append(cube.get_rand_booster(booster_size))
+        booster = cube.get_rand_booster(booster_size, pulls)
+        boosters.append(booster)
+        pulls = add_dicts(pulls, booster)
 
     return boosters
 
